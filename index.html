@@ -1,0 +1,1152 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>3D Molecule Studio - live data &amp; 3D conformers by CID</title>
+    <meta
+      name="description"
+      content="Fetch PubChem compound data and published 3D conformers by CID, inspect them in a full-screen molecular workspace, and export SDF, MOL, XYZ, GLB, JSON or PNG."
+    />
+    <meta name="theme-color" content="#070c10" />
+    <meta property="og:title" content="3D Molecule Studio" />
+    <meta
+      property="og:description"
+      content="Live, verifiable PubChem data and 3D conformers by CID. Export SDF, MOL, XYZ, GLB, JSON and PNG."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <svg class="svg-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="icon-search" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="7" />
+        <path d="m16.5 16.5 4.5 4.5" />
+      </symbol>
+      <symbol id="icon-arrow-right" viewBox="0 0 24 24">
+        <path d="M5 12h14" />
+        <path d="m13 6 6 6-6 6" />
+      </symbol>
+      <symbol id="icon-external" viewBox="0 0 24 24">
+        <path d="M14 3h7v7" />
+        <path d="m21 3-9 9" />
+        <path d="M19 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6" />
+      </symbol>
+      <symbol id="icon-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+      </symbol>
+      <symbol id="icon-download" viewBox="0 0 24 24">
+        <path d="M12 3v12" />
+        <path d="m7 10 5 5 5-5" />
+        <path d="M5 21h14" />
+      </symbol>
+      <symbol id="icon-camera" viewBox="0 0 24 24">
+        <path d="M4 7h3l2-3h6l2 3h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z" />
+        <circle cx="12" cy="13" r="3.5" />
+      </symbol>
+      <symbol id="icon-expand" viewBox="0 0 24 24">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+        <path d="M16 3h3a2 2 0 0 1 2 2v3" />
+        <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
+        <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+      </symbol>
+      <symbol id="icon-reset" viewBox="0 0 24 24">
+        <path d="M3 12a9 9 0 1 0 2.6-6.4L3 8" />
+        <path d="M3 3v5h5" />
+      </symbol>
+      <symbol id="icon-spin" viewBox="0 0 24 24">
+        <path d="M21 12a9 9 0 1 1-2.6-6.4" />
+        <path d="M21 3v6h-6" />
+      </symbol>
+      <symbol id="icon-surface" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="8.5" />
+        <ellipse cx="12" cy="12" rx="3.6" ry="8.5" />
+        <path d="M3.5 12h17" />
+      </symbol>
+      <symbol id="icon-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+      </symbol>
+      <symbol id="icon-moon" viewBox="0 0 24 24">
+        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+      </symbol>
+      <symbol id="icon-close" viewBox="0 0 24 24">
+        <path d="m6 6 12 12" />
+        <path d="M18 6 6 18" />
+      </symbol>
+      <symbol id="icon-check" viewBox="0 0 24 24">
+        <path d="m5 12 4.5 4.5L19 6" />
+      </symbol>
+      <symbol id="icon-info" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 11v5" />
+        <path d="M12 8h.01" />
+      </symbol>
+      <symbol id="icon-atom" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="2.4" />
+        <ellipse cx="12" cy="12" rx="9.5" ry="4.2" transform="rotate(30 12 12)" />
+        <ellipse cx="12" cy="12" rx="9.5" ry="4.2" transform="rotate(-30 12 12)" />
+        <ellipse cx="12" cy="12" rx="9.5" ry="4.2" transform="rotate(90 12 12)" />
+      </symbol>
+      <symbol id="icon-database" viewBox="0 0 24 24">
+        <ellipse cx="12" cy="5.5" rx="8" ry="3" />
+        <path d="M4 5.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" />
+        <path d="M4 11.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" />
+      </symbol>
+      <symbol id="icon-shield" viewBox="0 0 24 24">
+        <path d="m12 3 8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3Z" />
+        <path d="m9 12 2 2 4-4" />
+      </symbol>
+      <symbol id="icon-chevron-down" viewBox="0 0 24 24">
+        <path d="m6 9 6 6 6-6" />
+      </symbol>
+      <symbol id="icon-editor" viewBox="0 0 24 24">
+        <path d="M4 7h8M18 7h2M4 17h2M12 17h8" />
+        <circle cx="15" cy="7" r="2.2" />
+        <circle cx="9" cy="17" r="2.2" />
+      </symbol>
+      <symbol id="icon-bond" viewBox="0 0 24 24">
+        <circle cx="5.5" cy="12" r="2.6" />
+        <circle cx="18.5" cy="12" r="2.6" />
+        <path d="M8.1 12h7.8" />
+      </symbol>
+      <symbol id="icon-studio" viewBox="0 0 24 24">
+        <rect x="3" y="4.5" width="18" height="15" rx="3" />
+        <path d="M8 4.5v15M16 4.5v15M3 9h5M16 9h5M3 15h5M16 15h5" />
+      </symbol>
+      <symbol id="icon-cube" viewBox="0 0 24 24">
+        <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z" />
+        <path d="M4 7.5 12 12l8-4.5M12 12v9" />
+      </symbol>
+      <symbol id="icon-layers" viewBox="0 0 24 24">
+        <path d="m12 3 9 5-9 5-9-5 9-5Z" />
+        <path d="m3 12 9 5 9-5" />
+        <path d="m3 16 9 5 9-5" />
+      </symbol>
+      <symbol id="icon-eye" viewBox="0 0 24 24">
+        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+        <circle cx="12" cy="12" r="3" />
+      </symbol>
+      <symbol id="icon-eye-off" viewBox="0 0 24 24">
+        <path d="m3 3 18 18" />
+        <path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a17.7 17.7 0 0 1-3.3 4.1" />
+        <path d="M6.6 6.7A17.4 17.4 0 0 0 2 12s3.5 7 10 7a10.9 10.9 0 0 0 5.6-1.5" />
+      </symbol>
+      <symbol id="icon-palette" viewBox="0 0 24 24">
+        <path d="M12 3a9 9 0 1 0 0 18h1.5a2 2 0 0 0 1.6-3.2 2 2 0 0 1 1.6-3.2H19a2 2 0 0 0 2-2A9 9 0 0 0 12 3Z" />
+        <circle cx="7.5" cy="10" r="1" />
+        <circle cx="10" cy="6.5" r="1" />
+        <circle cx="15" cy="7.5" r="1" />
+      </symbol>
+    </svg>
+
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <div class="app-shell" id="app-shell">
+      <header class="app-bar">
+        <a class="brand" href="./" aria-label="3D Molecule Studio home">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M16 2.8 27.4 9.4v13.2L16 29.2 4.6 22.6V9.4L16 2.8Z" />
+            <circle cx="16" cy="16" r="3.1" class="brand-core" />
+            <circle cx="16" cy="7.6" r="1.9" />
+            <circle cx="23.4" cy="20.4" r="1.9" />
+            <circle cx="8.6" cy="20.4" r="1.9" />
+            <path d="M16 9.5v3.4M18.4 17.6l2.9 1.6M13.6 17.6l-2.9 1.6" />
+          </svg>
+          <span class="brand-name">3D Molecule <span>Studio</span></span>
+        </a>
+
+        <form id="search-form" class="top-search" novalidate>
+          <label for="cid-input" class="sr-only">PubChem CID</label>
+          <div class="cid-field">
+            <span class="cid-prefix">CID</span>
+            <input
+              id="cid-input"
+              name="cid"
+              type="text"
+              inputmode="numeric"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="2244"
+              aria-describedby="search-error"
+            />
+            <button id="clear-btn" class="clear-btn" type="button" aria-label="Clear CID" hidden>
+              <svg class="icon"><use href="#icon-close" /></svg>
+            </button>
+          </div>
+          <button id="load-btn" class="load-btn" type="submit">
+            <span id="load-btn-label">Load</span>
+            <svg class="icon"><use href="#icon-arrow-right" /></svg>
+          </button>
+        </form>
+
+        <div class="app-bar-actions">
+          <button
+            id="editor-toggle"
+            class="editor-toggle"
+            type="button"
+            aria-pressed="false"
+            aria-label="Open editor"
+            title="Open the editor"
+          >
+            <svg class="icon"><use href="#icon-editor" /></svg>
+            <span>Editor</span>
+          </button>
+          <button
+            id="studio-toggle"
+            class="editor-toggle studio-toggle"
+            type="button"
+            aria-pressed="false"
+            aria-label="Open animation studio"
+            title="Open the animation studio"
+          >
+            <svg class="icon"><use href="#icon-studio" /></svg>
+            <span>Studio</span>
+          </button>
+          <button
+            id="toggle-properties"
+            class="panel-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="properties-panel"
+            aria-label="Toggle properties panel"
+            title="Toggle properties panel"
+          >
+            <svg class="icon"><use href="#icon-database" /></svg>
+            <span>Properties</span>
+          </button>
+          <button
+            id="toggle-layers"
+            class="panel-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="layers-panel"
+            aria-label="Toggle layers panel"
+            title="Toggle layers panel"
+            hidden
+          >
+            <svg class="icon"><use href="#icon-layers" /></svg>
+            <span>Layers</span>
+          </button>
+          <button
+            id="toggle-customize"
+            class="panel-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="customize-panel"
+            aria-label="Toggle customize panel"
+            title="Toggle customize panel"
+            hidden
+          >
+            <svg class="icon"><use href="#icon-palette" /></svg>
+            <span>Customize</span>
+          </button>
+          <button
+            id="toggle-export"
+            class="panel-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="export-card"
+            aria-label="Toggle export panel"
+            title="Toggle export panel"
+            disabled
+          >
+            <svg class="icon"><use href="#icon-download" /></svg>
+            <span>Export</span>
+          </button>
+          <button
+            id="tour-toggle"
+            class="icon-btn"
+            type="button"
+            aria-label="Open the quick tour"
+            title="Quick tour"
+          >
+            <svg class="icon"><use href="#icon-info" /></svg>
+          </button>
+          <button
+            id="theme-toggle"
+            class="icon-btn"
+            type="button"
+            aria-pressed="false"
+            aria-label="Toggle color theme"
+            title="Switch theme"
+          >
+            <svg class="icon icon-sun"><use href="#icon-sun" /></svg>
+            <svg class="icon icon-moon"><use href="#icon-moon" /></svg>
+          </button>
+          <a
+            class="icon-btn"
+            href="https://pubchem.ncbi.nlm.nih.gov/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open NCBI PubChem"
+            title="NCBI PubChem"
+          >
+            <svg class="icon"><use href="#icon-external" /></svg>
+          </a>
+        </div>
+      </header>
+
+      <p id="search-error" class="search-error app-error" role="alert" hidden></p>
+
+      <main class="app-main" id="main">
+        <aside class="customize-panel" id="customize-panel" aria-label="Customize appearance" aria-hidden="true">
+          <header class="panel-head">
+            <div>
+              <span class="panel-eyebrow">Editor</span>
+              <h2>Customize</h2>
+            </div>
+            <button id="close-customize" class="icon-btn" type="button" aria-label="Close customize panel" title="Close panel">
+              <svg class="icon"><use href="#icon-close" /></svg>
+            </button>
+          </header>
+
+          <section id="item-editor" class="item-editor" aria-label="Selection settings" hidden>
+            <div class="item-head">
+              <span class="panel-eyebrow">Selection settings</span>
+              <span id="item-title" class="item-title">—</span>
+            </div>
+            <div class="item-fields">
+              <label class="item-field">
+                <span>Visible</span>
+                <input id="item-visible" type="checkbox" />
+              </label>
+              <label id="item-color-field" class="item-field">
+                <span>Colour</span>
+                <input id="item-color" type="color" value="#8b979f" />
+              </label>
+              <label id="item-order-field" class="item-field" hidden>
+                <span>Order</span>
+                <select id="item-order">
+                  <option value="1">Single</option>
+                  <option value="2">Double</option>
+                  <option value="3">Triple</option>
+                </select>
+              </label>
+              <label id="item-connection-style-field" class="item-field" hidden>
+                <span>Style</span>
+                <select id="item-connection-style">
+                  <option value="solid">Solid</option>
+                  <option value="dashed">Dashed</option>
+                  <option value="arrow">Arrow</option>
+                </select>
+              </label>
+              <label id="item-size-field" class="item-field" hidden>
+                <span id="item-size-label">Size</span>
+                <input id="item-size" type="range" min="0.5" max="2" step="0.05" value="1" />
+                <output id="item-size-value">1.00×</output>
+              </label>
+              <label id="item-opacity-field" class="item-field" hidden>
+                <span>Opacity</span>
+                <input id="item-opacity" type="range" min="0.15" max="1" step="0.05" value="1" />
+                <output id="item-opacity-value">100%</output>
+              </label>
+              <label id="item-material-field" class="item-field">
+                <span>Material</span>
+                <select id="item-material">
+                  <option value="inherit">Inherit</option>
+                  <option value="standard">Standard</option>
+                  <option value="outline">Outline</option>
+                  <option value="metal">Metal</option>
+                  <option value="chrome">Chrome</option>
+                  <option value="gold">Gold</option>
+                  <option value="glass">Glass</option>
+                  <option value="plastic">Plastic</option>
+                  <option value="ceramic">Ceramic</option>
+                  <option value="matte">Matte</option>
+                  <option value="neon">Neon</option>
+                  <option value="clay">Clay</option>
+                </select>
+              </label>
+              <label id="item-gloss-field" class="item-field">
+                <span>Gloss</span>
+                <input id="item-gloss" type="range" min="0" max="1" step="0.05" value="0.5" />
+                <output id="item-gloss-value">50%</output>
+              </label>
+            </div>
+            <button id="item-reset" class="ghost-btn item-reset" type="button">Reset item</button>
+            <p class="item-note">Colour overrides material palette. Display edits only — geometry exports keep the original PubChem record.</p>
+          </section>
+
+          <div class="customize-body" role="region" aria-label="Global settings">
+            <header class="customize-global-head">
+              <span class="panel-eyebrow">Global settings</span>
+              <p>Scene-wide defaults. Per-selection settings stack on top.</p>
+            </header>
+            <section class="custom-section">
+              <h3 class="custom-title">Size</h3>
+              <label class="custom-field">
+                <span>Atom size</span>
+                <input id="custom-atom-size" type="range" min="0.5" max="2" step="0.05" value="1" />
+                <output id="custom-atom-size-value">1.00×</output>
+              </label>
+              <label class="custom-field">
+                <span>Bond thickness</span>
+                <input id="custom-bond-size" type="range" min="0.5" max="2" step="0.05" value="1" />
+                <output id="custom-bond-size-value">1.00×</output>
+              </label>
+            </section>
+
+            <section class="custom-section">
+              <h3 class="custom-title">Material</h3>
+              <label class="custom-field">
+                <span>Finish</span>
+                <select id="custom-material">
+                  <option value="standard">Standard</option>
+                  <option value="outline">Outline</option>
+                  <option value="metal">Metal</option>
+                  <option value="chrome">Chrome</option>
+                  <option value="gold">Gold</option>
+                  <option value="glass">Glass</option>
+                  <option value="plastic">Plastic</option>
+                  <option value="ceramic">Ceramic</option>
+                  <option value="matte">Matte</option>
+                  <option value="neon">Neon</option>
+                  <option value="clay">Clay</option>
+                </select>
+              </label>
+              <label class="custom-field">
+                <span>Lighting</span>
+                <select id="custom-lighting">
+                  <option value="studio">Studio</option>
+                  <option value="soft">Soft</option>
+                  <option value="bright">Bright</option>
+                  <option value="dramatic">Dramatic</option>
+                  <option value="rim">Rim light</option>
+                </select>
+              </label>
+              <label class="custom-field">
+                <span>Gloss</span>
+                <input id="custom-material-gloss" type="range" min="0" max="1" step="0.05" value="0.5" />
+                <output id="custom-material-gloss-value">50%</output>
+              </label>
+              <label class="custom-field">
+                <span>Opacity</span>
+                <input id="custom-opacity" type="range" min="0.15" max="1" step="0.05" value="1" />
+                <output id="custom-opacity-value">100%</output>
+              </label>
+              <label class="custom-field" title="Used by the Lines viewport style">
+                <span>Line width (Lines)</span>
+                <input id="custom-line-width" type="range" min="1" max="4" step="0.1" value="1.6" />
+                <output id="custom-line-width-value">1.6</output>
+              </label>
+              <p class="custom-note">Gloss lightens or darkens the material palette; metal and neon add an outline. Materials use element colours — Single colour overrides them. Line width is used by the Lines style.</p>
+            </section>
+
+            <section class="custom-section">
+              <h3 class="custom-title">Scene guides</h3>
+              <label class="custom-field">
+                <span>Axes</span>
+                <input id="custom-axes" type="checkbox" />
+              </label>
+              <label class="custom-field">
+                <span>Grid</span>
+                <input id="custom-grid" type="checkbox" />
+              </label>
+              <label class="custom-field">
+                <span>Grid spacing</span>
+                <input id="custom-grid-spacing" type="range" min="0.5" max="8" step="0.5" value="2" />
+                <output id="custom-grid-spacing-value">2.0 Å</output>
+              </label>
+              <label class="custom-field">
+                <span>Grid plane</span>
+                <select id="custom-grid-plane">
+                  <option value="xz">Floor (XZ)</option>
+                  <option value="xy">Front (XY)</option>
+                  <option value="yz">Side (YZ)</option>
+                </select>
+              </label>
+              <label class="custom-field">
+                <span>Grids</span>
+                <select id="custom-grid-mode">
+                  <option value="single">Single plane</option>
+                  <option value="triple">Three planes</option>
+                </select>
+              </label>
+              <label class="custom-field">
+                <span>Scale bar</span>
+                <input id="custom-scale" type="checkbox" />
+              </label>
+              <label class="custom-field">
+                <span>Unit labels</span>
+                <input id="custom-units" type="checkbox" />
+              </label>
+              <p class="custom-note">Guides are display-only and appear in PNG, WebM and GIF exports.</p>
+            </section>
+
+            <section class="custom-section">
+              <h3 class="custom-title">Colour</h3>
+              <label class="custom-field">
+                <span>Atom scheme</span>
+                <select id="custom-color-scheme">
+                  <option value="Jmol">Jmol elements</option>
+                  <option value="custom">Single colour</option>
+                </select>
+              </label>
+              <label class="custom-field" id="custom-color-field" hidden>
+                <span>Custom colour</span>
+                <input id="custom-color" type="color" value="#2dd4bf" />
+              </label>
+            </section>
+
+            <section class="custom-section">
+              <h3 class="custom-title">Surface</h3>
+              <label class="custom-field">
+                <span>Surface colour</span>
+                <input id="custom-surface-color" type="color" value="#2dd4bf" />
+              </label>
+              <label class="custom-field">
+                <span>Surface opacity</span>
+                <input id="custom-surface-opacity" type="range" min="0.05" max="1" step="0.05" value="0.5" />
+                <output id="custom-surface-opacity-value">50%</output>
+              </label>
+            </section>
+
+            <section class="custom-section">
+              <h3 class="custom-title">Viewport</h3>
+              <div class="custom-field">
+                <span>Background</span>
+                <input id="custom-background" type="color" value="#050b10" />
+              </div>
+              <div class="custom-background-modes">
+                <button id="custom-background-reset" class="ghost-btn custom-mini" type="button" aria-pressed="true" title="Follow the light or dark theme">Theme</button>
+                <button id="custom-background-transparent" class="ghost-btn custom-mini" type="button" aria-pressed="false" title="Clear the canvas to transparency">Transparent</button>
+              </div>
+              <p class="custom-note">Transparent backgrounds are preserved in PNG exports.</p>
+            </section>
+
+            <button id="custom-reset" class="ghost-btn custom-reset" type="button">Reset appearance</button>
+            <p class="custom-note">Display-only settings — geometry exports keep the original PubChem record.</p>
+          </div>
+        </aside>
+
+        <article class="viewer-card" id="viewer-card" data-state="empty">
+          <header class="viewer-head">
+            <div class="viewer-identity">
+              <div class="viewer-title-row">
+                <h2 id="mol-title">No molecule loaded</h2>
+              </div>
+              <p id="mol-subtitle" class="viewer-subtitle">
+                Search a PubChem CID to begin.
+              </p>
+              <div id="conformer-control" class="conformer-control" hidden>
+                <span class="conformer-label">3D conformer</span>
+                <button id="conformer-prev" class="conformer-btn" type="button" aria-label="Previous conformer" title="Previous conformer">‹</button>
+                <div class="conformer-picker">
+                  <button
+                    id="conformer-trigger"
+                    class="conformer-trigger"
+                    type="button"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="conformer-menu"
+                    aria-label="Select 3D conformer"
+                  >
+                    <span id="conformer-trigger-text">Conformer 1</span>
+                    <svg class="icon"><use href="#icon-chevron-down" /></svg>
+                  </button>
+                  <div id="conformer-menu" class="conformer-menu" role="listbox" aria-label="3D conformers" hidden></div>
+                </div>
+                <span id="conformer-count" class="conformer-count"></span>
+                <button id="conformer-next" class="conformer-btn" type="button" aria-label="Next conformer" title="Next conformer">›</button>
+              </div>
+            </div>
+
+            <div class="viewer-tools" role="toolbar" aria-label="3D viewer controls">
+              <div id="editor-items" class="editor-items" role="group" aria-label="Editor items" hidden>
+                <span class="editor-items-label">Item</span>
+                <button
+                  class="editor-item is-active"
+                  type="button"
+                  data-editor-item="viewport"
+                  aria-pressed="true"
+                  title="3D viewport"
+                >
+                  <svg class="icon"><use href="#icon-cube" /></svg>
+                  3D viewport
+                </button>
+              </div>
+              <button
+                id="connect-toggle"
+                class="tool-btn tool-btn-wide"
+                type="button"
+                aria-pressed="false"
+                title="Connect atoms between compounds"
+                hidden
+              >
+                <svg class="icon"><use href="#icon-bond" /></svg>
+                <span>Connect</span>
+              </button>
+              <div class="segmented" role="group" aria-label="Model style">
+                <button class="tool-style is-active" type="button" data-style="ball-stick" aria-pressed="true" title="Atoms as spheres, bonds as sticks">Ball &amp; stick</button>
+                <button class="tool-style" type="button" data-style="sticks" aria-pressed="false" title="Bonds only; uniform single sticks, no double bonds">Sticks</button>
+                <button class="tool-style" type="button" data-style="spheres" aria-pressed="false" title="Van der Waals spheres">Spheres</button>
+                <button class="tool-style" type="button" data-style="lines" aria-pressed="false" title="Thin lines">Lines</button>
+              </div>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <button id="toggle-h" class="tool-btn" type="button" aria-pressed="true" title="Show hydrogens" aria-label="Show hydrogens">H</button>
+              <button id="toggle-spin" class="tool-btn" type="button" aria-pressed="false" title="Spin model" aria-label="Spin model">
+                <svg class="icon"><use href="#icon-spin" /></svg>
+              </button>
+              <button
+                id="toggle-surface"
+                class="tool-btn"
+                type="button"
+                aria-pressed="false"
+                title="Toggle van der Waals surface (generated locally)"
+                aria-label="Toggle van der Waals surface"
+              >
+                <svg class="icon"><use href="#icon-surface" /></svg>
+              </button>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <button id="reset-view" class="tool-btn" type="button" title="Reset view" aria-label="Reset view">
+                <svg class="icon"><use href="#icon-reset" /></svg>
+              </button>
+              <button id="screenshot" class="tool-btn" type="button" title="Download high-res PNG snapshot" aria-label="Download high-res PNG snapshot">
+                <svg class="icon"><use href="#icon-camera" /></svg>
+              </button>
+              <button id="fullscreen" class="tool-btn" type="button" aria-pressed="false" title="Fullscreen" aria-label="Toggle fullscreen">
+                <svg class="icon"><use href="#icon-expand" /></svg>
+              </button>
+            </div>
+          </header>
+
+          <div class="viewer-body" id="viewer-body">
+            <div id="viewer" class="viewer-canvas" role="img" aria-label="Interactive 3D molecular model"></div>
+
+            <div id="recording-guide" class="recording-guide" hidden aria-hidden="true">
+              <div id="recording-guide-frame" class="recording-guide-frame">
+                <span id="recording-guide-label" class="recording-guide-label">16:9 · 1920×1080</span>
+              </div>
+            </div>
+
+            <div id="axis-gizmo" class="axis-gizmo" role="group" aria-label="View orientation" hidden>
+              <svg viewBox="0 0 100 100">
+                <g data-axis="x" role="button" tabindex="0" aria-label="View from the X axis">
+                  <line x1="50" y1="50" x2="88" y2="50" />
+                  <circle class="axis-ball" cx="88" cy="50" r="9.5" />
+                  <text x="88" y="50">X</text>
+                </g>
+                <g data-axis="y" role="button" tabindex="0" aria-label="View from the Y axis">
+                  <line x1="50" y1="50" x2="50" y2="12" />
+                  <circle class="axis-ball" cx="50" cy="12" r="9.5" />
+                  <text x="50" y="12">Y</text>
+                </g>
+                <g data-axis="z" role="button" tabindex="0" aria-label="View from the Z axis">
+                  <line x1="50" y1="50" x2="23" y2="77" />
+                  <circle class="axis-ball" cx="23" cy="77" r="9.5" />
+                  <text x="23" y="77">Z</text>
+                </g>
+                <g data-axis="-x" role="button" tabindex="0" aria-label="View from the negative X axis">
+                  <line x1="50" y1="50" x2="12" y2="50" />
+                  <circle class="axis-ball" cx="12" cy="50" r="6.5" />
+                </g>
+                <g data-axis="-y" role="button" tabindex="0" aria-label="View from the negative Y axis">
+                  <line x1="50" y1="50" x2="50" y2="88" />
+                  <circle class="axis-ball" cx="50" cy="88" r="6.5" />
+                </g>
+                <g data-axis="-z" role="button" tabindex="0" aria-label="View from the negative Z axis">
+                  <line x1="50" y1="50" x2="77" y2="23" />
+                  <circle class="axis-ball" cx="77" cy="23" r="6.5" />
+                </g>
+              </svg>
+            </div>
+
+            <div id="viewer-empty" class="viewer-overlay viewer-empty-state">
+              <div class="empty-illustration">
+                <svg viewBox="0 0 120 120" aria-hidden="true">
+                  <circle cx="60" cy="60" r="48" class="empty-ring" />
+                  <path d="M60 28v16M60 76v16M28 60h16M76 60h16M37 37l11 11M72 72l11 11M83 37 72 48M48 72 37 83" class="empty-bonds" />
+                  <circle cx="60" cy="60" r="11" class="empty-core" />
+                  <circle cx="60" cy="24" r="6" class="empty-atom" />
+                  <circle cx="96" cy="60" r="6" class="empty-atom" />
+                  <circle cx="60" cy="96" r="6" class="empty-atom" />
+                  <circle cx="24" cy="60" r="6" class="empty-atom" />
+                </svg>
+              </div>
+              <h3>No model in view</h3>
+              <p>Your molecule will be rendered here with the exact coordinates PubChem publishes.</p>
+            </div>
+
+            <div id="viewer-loading" class="viewer-overlay viewer-loading" hidden>
+              <div class="loading-card">
+                <div class="spinner" aria-hidden="true"></div>
+                <p class="loading-title">Fetching CID <span id="loading-cid">—</span></p>
+                <p class="loading-sub">Live from PubChem PUG REST</p>
+                <div class="loading-steps">
+                  <div class="load-step" data-step="properties" data-status="pending">
+                    <span class="step-dot" aria-hidden="true"></span>
+                    <span class="step-label">Property table</span>
+                    <span class="step-note"></span>
+                  </div>
+                  <div class="load-step" data-step="conformer" data-status="pending">
+                    <span class="step-dot" aria-hidden="true"></span>
+                    <span class="step-label">3D conformer (SDF)</span>
+                    <span class="step-note"></span>
+                  </div>
+                  <div class="load-step" data-step="synonyms" data-status="pending">
+                    <span class="step-dot" aria-hidden="true"></span>
+                    <span class="step-label">Synonyms</span>
+                    <span class="step-note"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="viewer-message" class="viewer-overlay viewer-message" hidden>
+              <div class="message-card">
+                <img id="msg-image" class="message-image" alt="" hidden />
+                <h3 id="msg-title"></h3>
+                <p id="msg-text"></p>
+                <div class="message-actions">
+                  <a id="msg-link" class="ghost-btn" href="#" target="_blank" rel="noopener noreferrer" hidden>
+                    Open on PubChem
+                  </a>
+                  <button id="msg-retry" class="ghost-btn" type="button" hidden>Try again</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="viewer-hud">
+              <span id="hud-record" class="hud-pill">AWAITING RECORD</span>
+              <a
+                id="cid-badge"
+                class="cid-badge hud-cid"
+                href="https://pubchem.ncbi.nlm.nih.gov/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open PubChem record"
+                hidden
+              >
+                <span id="cid-badge-text">CID</span>
+                <svg class="icon"><use href="#icon-external" /></svg>
+              </a>
+            </div>
+
+            <div id="scale-bar" class="scale-bar" hidden aria-hidden="true">
+              <span id="scale-bar-label" class="scale-bar-label">10 Å</span>
+              <span id="scale-bar-line" class="scale-bar-line"></span>
+            </div>
+
+            <div id="connect-bar" class="connect-bar" role="toolbar" aria-label="Connect atoms" hidden>
+              <span id="connect-status" class="connect-status">Pick the first atom</span>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <div class="connect-group" role="group" aria-label="Bond order">
+                <button class="connect-btn is-active" type="button" data-connect-order="1" aria-pressed="true" title="Single bond">1</button>
+                <button class="connect-btn" type="button" data-connect-order="2" aria-pressed="false" title="Double bond">2</button>
+                <button class="connect-btn" type="button" data-connect-order="3" aria-pressed="false" title="Triple bond">3</button>
+              </div>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <div class="connect-group" role="group" aria-label="Bond style">
+                <button class="connect-btn is-active" type="button" data-connect-style="solid" aria-pressed="true" title="Solid bond">Solid</button>
+                <button class="connect-btn" type="button" data-connect-style="dashed" aria-pressed="false" title="Dashed bond">Dashed</button>
+                <button class="connect-btn" type="button" data-connect-style="arrow" aria-pressed="false" title="Arrow bond">Arrow</button>
+              </div>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <label class="connect-join" title="Move and turn the second compound to a sensible bond length">
+                <input id="connect-join" type="checkbox" checked />
+                Snap
+              </label>
+              <button id="connect-cancel" class="ghost-btn connect-done" type="button">Done</button>
+            </div>
+
+            <div id="transform-bar" class="transform-bar" role="toolbar" aria-label="Object transform" hidden>
+              <span id="transform-target" class="transform-target">Object</span>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <button
+                class="transform-btn is-active"
+                type="button"
+                data-transform-mode="rotate"
+                aria-pressed="true"
+                title="Drag a model to rotate it"
+              >Rotate</button>
+              <button
+                class="transform-btn"
+                type="button"
+                data-transform-mode="move"
+                aria-pressed="false"
+                title="Drag a model to move it"
+              >Move</button>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <button id="transform-reset" class="transform-btn" type="button" title="Reset the selected model's transform">Reset</button>
+            </div>
+          </div>
+
+          <section id="studio-dock" class="studio-dock" aria-label="Studio animation" hidden>
+            <div class="studio-toolbar">
+              <div class="studio-heading">
+                <span class="panel-eyebrow">Studio</span>
+                <strong>Animation</strong>
+              </div>
+              <label class="studio-field">
+                <span>Compounds</span>
+                <select id="studio-scene-motion">
+                  <option value="none">Still</option>
+                  <option value="spin" selected>Spin</option>
+                  <option value="rock">Rock</option>
+                </select>
+              </label>
+              <label class="studio-field">
+                <span>Axis</span>
+                <select id="studio-scene-axis">
+                  <option value="x">X</option>
+                  <option value="y" selected>Y</option>
+                  <option value="z">Z</option>
+                </select>
+              </label>
+              <label class="studio-check" title="Reverse the compound motion instead of looping forward">
+                <input id="studio-scene-pingpong" type="checkbox" />
+                Ping-pong
+              </label>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <label class="studio-field">
+                <span>Camera</span>
+                <select id="studio-camera-motion">
+                  <option value="none" selected>Still</option>
+                  <option value="orbit">Orbit</option>
+                  <option value="rock">Rock</option>
+                  <option value="zoom">Zoom</option>
+                </select>
+              </label>
+              <label class="studio-field">
+                <span>Axis</span>
+                <select id="studio-camera-axis">
+                  <option value="x">X</option>
+                  <option value="y" selected>Y</option>
+                  <option value="z">Z</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </label>
+              <label class="studio-field">
+                <span>Angle</span>
+                <input id="studio-camera-angle" type="number" step="15" value="360" />
+                <span>°</span>
+              </label>
+              <button id="studio-camera-use-view" class="ghost-btn studio-btn" type="button" title="Set the orbit angle from the current dragged view">Use view</button>
+              <div id="studio-camera-custom" class="studio-custom-axis" hidden title="Custom camera orbit axis">
+                <span class="studio-group-label">Axis</span>
+                <input id="studio-camera-x" class="studio-axis-input" type="number" step="0.1" value="0" aria-label="Custom axis X" />
+                <input id="studio-camera-y" class="studio-axis-input" type="number" step="0.1" value="1" aria-label="Custom axis Y" />
+                <input id="studio-camera-z" class="studio-axis-input" type="number" step="0.1" value="0" aria-label="Custom axis Z" />
+              </div>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <label class="studio-field">
+                <span>Background</span>
+                <input id="studio-background" type="color" value="#050b10" />
+              </label>
+              <div class="studio-group">
+                <button id="studio-background-reset" class="ghost-btn studio-btn" type="button" title="Use the theme background">Theme</button>
+                <button id="studio-background-transparent" class="ghost-btn studio-btn" type="button" title="Use a transparent background">Clear</button>
+              </div>
+              <label class="studio-field">
+                <span>Length</span>
+                <input id="studio-duration" type="number" step="0.1" value="6" />
+                <span>s</span>
+              </label>
+              <label class="studio-check">
+                <input id="studio-loop" type="checkbox" checked />
+                Loop
+              </label>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <label class="studio-field">
+                <span>Rate</span>
+                <select id="studio-fps">
+                  <option value="24">24 fps</option>
+                  <option value="30" selected>30 fps</option>
+                  <option value="60">60 fps</option>
+                </select>
+              </label>
+              <label class="studio-field">
+                <span>Size</span>
+                <select id="studio-size">
+                  <option value="720">720p</option>
+                  <option value="1080" selected>1080p</option>
+                  <option value="1440">1440p</option>
+                </select>
+              </label>
+              <label class="studio-field">
+                <span>Aspect</span>
+                <select id="studio-aspect">
+                  <option value="wide" selected>16:9</option>
+                  <option value="square">Square</option>
+                  <option value="portrait">Portrait</option>
+                </select>
+              </label>
+              <label class="studio-check" title="Show the recording crop frame in the viewport">
+                <input id="studio-recording-guide" type="checkbox" checked />
+                Border
+              </label>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <button id="studio-play" class="ghost-btn studio-btn" type="button">Play</button>
+              <button id="studio-stop" class="ghost-btn studio-btn" type="button">Stop</button>
+              <span id="studio-time" class="studio-time">0.00 s</span>
+              <button id="studio-gif" class="ghost-btn studio-btn studio-gif" type="button" title="Export a short animated GIF">GIF</button>
+              <button id="studio-record" class="studio-record" type="button">Record</button>
+            </div>
+
+            <div class="studio-subbar" role="toolbar" aria-label="Studio scene and view controls">
+              <span class="studio-group-label">Scene</span>
+              <button class="ghost-btn studio-btn" type="button" data-studio-scene="fit" title="Center and fit the whole scene">Fit</button>
+              <button class="ghost-btn studio-btn" type="button" data-studio-scene="reset" title="Reset every compound transform">Reset</button>
+              <button class="ghost-btn studio-btn" type="button" data-studio-scene="row" title="Arrange compounds in a row">Row</button>
+              <button class="ghost-btn studio-btn" type="button" data-studio-scene="grid" title="Arrange compounds in a grid">Grid</button>
+              <button class="ghost-btn studio-btn" type="button" data-studio-scene="circle" title="Arrange compounds in a circle">Circle</button>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <span class="studio-group-label">View</span>
+              <button class="ghost-btn studio-btn" type="button" data-studio-frame="front" title="Look at the scene from the front">Front</button>
+              <button class="ghost-btn studio-btn" type="button" data-studio-frame="side" title="Look at the scene from the side">Side</button>
+              <button class="ghost-btn studio-btn" type="button" data-studio-frame="top" title="Look at the scene from above">Top</button>
+              <button class="ghost-btn studio-btn" type="button" data-studio-frame="iso" title="Use an isometric view">Isometric</button>
+            </div>
+
+            <div id="studio-items" class="studio-items" aria-label="Per-compound motions"></div>
+            <p class="studio-hint">Compounds: spin or rock every compound in place. Camera: orbit around X/Y/Z or a custom axis by the chosen angle, rock or zoom. Drag the view to set a start angle, or press Use view to turn a dragged view into the orbit angle, then Play or Record — no keyframes needed.</p>
+          </section>
+
+          <footer class="viewer-foot">
+            <span class="provenance-mini">
+              <span class="live-dot"></span>
+              <span id="provenance-text">No record loaded</span>
+            </span>
+            <span id="hash-mini" class="hash-mini" hidden>
+              SHA-256 <code id="hash-mini-value"></code>
+            </span>
+          </footer>
+        </article>
+
+        <aside class="side-panel" id="properties-panel" aria-label="Molecule properties" aria-hidden="true">
+          <header class="panel-head">
+            <div>
+              <span class="panel-eyebrow">Inspector</span>
+              <h2>Molecule data</h2>
+            </div>
+            <button id="close-properties" class="icon-btn" type="button" aria-label="Close properties panel" title="Close panel">
+              <svg class="icon"><use href="#icon-close" /></svg>
+            </button>
+          </header>
+
+          <div class="tabs" role="tablist" aria-label="Molecule data views">
+            <button class="tab" id="tab-overview" role="tab" aria-controls="panel-overview" aria-selected="true" tabindex="0" data-tab="overview">Properties</button>
+            <button class="tab" id="tab-identifiers" role="tab" aria-controls="panel-identifiers" aria-selected="false" tabindex="-1" data-tab="identifiers">Identifiers</button>
+            <button class="tab" id="tab-provenance" role="tab" aria-controls="panel-provenance" aria-selected="false" tabindex="-1" data-tab="provenance">Source</button>
+          </div>
+
+          <div class="tab-panels">
+            <section class="tab-panel" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+              <div id="overview-empty" class="panel-placeholder">
+                <svg class="icon placeholder-icon"><use href="#icon-database" /></svg>
+                <h3>Properties await a CID</h3>
+                <p>PubChem’s canonical property table will appear here, field by field.</p>
+              </div>
+
+              <div id="overview-content" hidden>
+                <div class="structure-strip">
+                  <div class="structure-thumb" id="structure-thumb">
+                    <img id="structure-2d" alt="2D structure from PubChem" decoding="async" />
+                    <span id="structure-fallback" class="structure-fallback" hidden>2D depiction unavailable</span>
+                  </div>
+                  <div class="structure-facts">
+                    <span class="fact-label">Molecular formula</span>
+                    <strong id="structure-formula" class="fact-formula">—</strong>
+                    <span id="structure-mw" class="fact-mw">—</span>
+                    <a id="structure-link" class="text-link" href="#" target="_blank" rel="noopener noreferrer">
+                      Open PubChem record
+                      <svg class="icon"><use href="#icon-external" /></svg>
+                    </a>
+                  </div>
+                </div>
+                <div id="prop-groups" class="prop-groups"></div>
+              </div>
+            </section>
+
+            <section class="tab-panel" id="panel-identifiers" role="tabpanel" aria-labelledby="tab-identifiers" hidden>
+              <div id="identifiers-empty" class="panel-placeholder">
+                <svg class="icon placeholder-icon"><use href="#icon-atom" /></svg>
+                <h3>Identifiers await a CID</h3>
+                <p>SMILES, InChI, InChIKey and synonyms will appear here.</p>
+              </div>
+              <div id="identifiers-content" hidden></div>
+            </section>
+
+            <section class="tab-panel" id="panel-provenance" role="tabpanel" aria-labelledby="tab-provenance" hidden>
+              <div id="provenance-empty" class="panel-placeholder">
+                <svg class="icon placeholder-icon"><use href="#icon-shield" /></svg>
+                <h3>Source &amp; integrity</h3>
+                <p>Every request, byte count and the SHA-256 of the 3D record will be listed here.</p>
+              </div>
+              <div id="provenance-content" hidden></div>
+            </section>
+          </div>
+        </aside>
+
+        <aside class="side-panel layers-panel" id="layers-panel" aria-label="Scene layers" aria-hidden="true">
+          <header class="panel-head">
+            <div>
+              <span class="panel-eyebrow">Editor</span>
+              <h2>Layers</h2>
+            </div>
+            <button id="close-layers" class="icon-btn" type="button" aria-label="Close layers panel" title="Close panel">
+              <svg class="icon"><use href="#icon-close" /></svg>
+            </button>
+          </header>
+
+          <div class="layers-body">
+            <div class="scene-head">
+              <span class="panel-eyebrow">Compounds</span>
+              <span id="scene-count" class="scene-count" aria-live="polite">0</span>
+            </div>
+            <div id="scene-tools" class="scene-tools" role="toolbar" aria-label="Scene layout">
+              <span class="scene-tools-label">Arrange</span>
+              <button class="scene-tool is-active" type="button" data-layout="row" aria-pressed="true" title="Arrange compounds in a row">Row</button>
+              <button class="scene-tool" type="button" data-layout="grid" aria-pressed="false" title="Arrange compounds in a grid">Grid</button>
+              <button class="scene-tool" type="button" data-layout="circle" aria-pressed="false" title="Arrange compounds in a circle">Circle</button>
+              <span class="tool-divider" aria-hidden="true"></span>
+              <button id="scene-fit" class="scene-tool" type="button" title="Center and fit the whole scene">Fit</button>
+              <button id="scene-reset" class="scene-tool" type="button" title="Reset every compound transform">Reset</button>
+            </div>
+            <ul id="scene-list" class="scene-list"></ul>
+            <p id="scene-empty" class="scene-empty">Add a CID above to build the scene.</p>
+            <p class="layers-hint">Select atoms or bonds here, or click them in the viewport. Ctrl/⌘-click adds to the selection; edit it in Customize. Use <strong>Connect</strong> in the viewport toolbar to link compounds.</p>
+
+            <div id="connections-head" class="layer-row layer-group-row added-bonds-head" hidden>
+              <button id="connections-chevron" class="layer-chevron" type="button" aria-label="Expand added bonds" aria-expanded="true">
+                <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down" /></svg>
+              </button>
+              <span class="layer-name">Added bonds</span>
+              <span id="connection-count" class="layer-count">0</span>
+              <button id="clear-connections" class="connection-clear" type="button" title="Remove all added bonds">Clear</button>
+            </div>
+            <ul id="connection-list" class="layer-children connection-list" hidden></ul>
+          </div>
+        </aside>
+
+        <section class="export-panel" id="export-card" aria-label="Export record" hidden>
+          <header class="export-head">
+            <div>
+              <span class="panel-eyebrow">Output</span>
+              <h2>Export record</h2>
+              <p>Download the exact retrieved data, or a mesh built from the edited scene.</p>
+            </div>
+            <div class="export-head-actions">
+              <span class="cid-badge" id="export-cid">CID</span>
+              <button id="close-export" class="icon-btn" type="button" aria-label="Close export panel" title="Close panel">
+                <svg class="icon"><use href="#icon-close" /></svg>
+              </button>
+            </div>
+          </header>
+
+          <div class="export-grid">
+            <button class="export-btn" type="button" data-export="sdf" disabled>
+              <span class="export-icon"><svg class="icon"><use href="#icon-download" /></svg></span>
+              <span class="export-body"><strong>SDF</strong><small data-size>Unavailable</small></span>
+              <span class="export-arrow" aria-hidden="true">↓</span>
+            </button>
+            <button class="export-btn" type="button" data-export="mol" disabled>
+              <span class="export-icon"><svg class="icon"><use href="#icon-download" /></svg></span>
+              <span class="export-body"><strong>MOL</strong><small data-size>Unavailable</small></span>
+              <span class="export-arrow" aria-hidden="true">↓</span>
+            </button>
+            <button class="export-btn" type="button" data-export="xyz" disabled>
+              <span class="export-icon"><svg class="icon"><use href="#icon-download" /></svg></span>
+              <span class="export-body"><strong>XYZ</strong><small data-size>Unavailable</small></span>
+              <span class="export-arrow" aria-hidden="true">↓</span>
+            </button>
+            <button class="export-btn" type="button" data-export="glb" disabled>
+              <span class="export-icon"><svg class="icon"><use href="#icon-atom" /></svg></span>
+              <span class="export-body"><strong>GLB</strong><small data-size>Unavailable</small></span>
+              <span class="export-arrow" aria-hidden="true">↓</span>
+            </button>
+            <button class="export-btn" type="button" data-export="json" disabled>
+              <span class="export-icon"><svg class="icon"><use href="#icon-database" /></svg></span>
+              <span class="export-body"><strong>JSON</strong><small data-size>Unavailable</small></span>
+              <span class="export-arrow" aria-hidden="true">↓</span>
+            </button>
+            <button class="export-btn" type="button" data-export="png" disabled title="Download a high-resolution PNG of the current view">
+              <span class="export-icon"><svg class="icon"><use href="#icon-camera" /></svg></span>
+              <span class="export-body"><strong>PNG</strong><small data-size>Unavailable</small></span>
+              <span class="export-arrow" aria-hidden="true">↓</span>
+            </button>
+          </div>
+
+          <div id="glb-options" class="glb-options" aria-label="GLB export options">
+            <label class="glb-option">
+              <span>GLB scope</span>
+              <select id="glb-scope">
+                <option value="scene" selected>Edited scene</option>
+                <option value="active">Active compound</option>
+              </select>
+            </label>
+            <label class="glb-option">
+              <span>Mesh quality</span>
+              <select id="glb-quality">
+                <option value="draft">Draft</option>
+                <option value="standard">Standard</option>
+                <option value="high" selected>High</option>
+                <option value="ultra">Ultra</option>
+              </select>
+            </label>
+            <label class="glb-option">
+              <span>Style</span>
+              <select id="glb-style">
+                <option value="viewer">Match viewer</option>
+                <option value="ball-stick">Ball &amp; stick</option>
+                <option value="sticks">Sticks</option>
+                <option value="spheres">Spheres</option>
+                <option value="lines">Lines</option>
+              </select>
+            </label>
+            <p id="glb-option-note" class="glb-option-note">Edited scene includes every visible compound, transform, colour, layer state and added bond. Ultra produces the largest files.</p>
+          </div>
+
+          <p id="export-note" class="export-note"></p>
+
+          <button id="export-all-sdf" class="ghost-btn all-conformers-btn" type="button" hidden>
+            Download all conformers (SDF)
+          </button>
+        </section>
+      </main>
+    </div>
+
+    <div id="tour" class="tour" hidden>
+      <div class="tour-card" role="dialog" aria-modal="true" aria-labelledby="tour-title" aria-describedby="tour-text">
+        <span class="panel-eyebrow">Quick tour <span id="tour-step-count" class="tour-step-count">1 / 5</span></span>
+        <h2 id="tour-title">Start in the Editor</h2>
+        <p id="tour-text">Open Editor to work with more than one compound. The 3D viewport is the first item in the editor strip.</p>
+        <div class="tour-dots" id="tour-dots" aria-hidden="true"></div>
+        <div class="tour-actions">
+          <button id="tour-skip" class="ghost-btn" type="button">Skip</button>
+          <button id="tour-prev" class="ghost-btn" type="button" hidden>Back</button>
+          <button id="tour-next" class="accent-btn" type="button">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="welcome" class="tour welcome" hidden>
+      <div
+        class="tour-card welcome-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="welcome-title"
+        aria-describedby="welcome-text"
+      >
+        <span class="panel-eyebrow">Work in progress</span>
+        <h2 id="welcome-title">Thanks for checking out the app!</h2>
+        <p id="welcome-text">
+          Some features are still a work in progress. Feel free to explore, and let me know if you
+          run into any bugs or have feature requests!
+        </p>
+        <div class="tour-actions welcome-actions">
+          <button id="welcome-close" class="accent-btn" type="button">Start exploring</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <script src="vendor/3dmol/3Dmol-min.js"></script>
+    <script src="vendor/gif/gif.js"></script>
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
